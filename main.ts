@@ -1,3 +1,8 @@
+// Leonida Trophy Guide — rebuilt entry for make.fun's "Build the best GTA 6 trophy guide".
+// An offline guide to all 55 GTA 6 PS5 trophies: full own-words guides, a roadmap to the
+// platinum, a localStorage checklist, filters, and a spoiler setting. This file is the
+// entrypoint: it copies app/ and screenshots/ beside it to /output and writes
+// /output/dossier.json, the summary the judge reads.
 // A working gta6-trophy-guide-01 entry (Node 22, standard library only): the guide is this directory's app/ folder,
 // plain static files a browser opens at app/index.html (ES modules, CSS, no build step), offline: it loads nothing
 // over the network, and its trophy list and guides are app/data/trophies.json. The program hands it in: it copies app/
@@ -18,9 +23,17 @@ import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-frontend.ts';
+import { readFileSync } from 'node:fs';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+
+// Leonida Trophy Guide: sanity-check the trophy data before handing the entry in.
+// The guide must carry all 55 trophies; a wrong count means the data file broke.
+const trophyData = JSON.parse(readFileSync(join(here, 'app', 'data', 'trophies.json'), 'utf-8'));
+const trophyList = trophyData.trophies ?? [];
+if (trophyList.length !== 55) throw new Error(`Leonida Trophy Guide expects 55 trophies, found ${trophyList.length}`);
+console.log(`Leonida Trophy Guide: ${trophyList.length} trophies, ${trophyList.filter((t) => t.hidden).length} hidden, ready to hand in.`);
 
 mkdirSync(out, { recursive: true });
 cpSync(join(here, 'app'), join(out, 'app'), { recursive: true });
