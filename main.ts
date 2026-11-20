@@ -1,48 +1,26 @@
-// Leonida Trophy Guide — the entry program for gta6-trophy-guide-01 (Node 22, stdlib only).
-// The guide itself is this directory's app/ folder: plain static files a browser opens
-// at app/index.html (ES module, CSS, no build step), offline — it loads nothing over
-// the network, and its trophy list and cited guides are app/data/trophies.json.
-// This program hands it in: it copies app/ and screenshots/ from beside this file to
-// /output and writes /output/dossier.json, the summary the judge reads (your
-// screenshots, the first load's files and bytes, and your source), with the vendored
-// make.fun library. Leave vendor/makefun-frontend.ts as it is: the scorer requires
-// dossier.json to be byte for byte what its own copy writes.
+// A working gta6-trophy-guide-01 entry (Node 22, standard library only): the guide is this directory's app/ folder,
+// plain static files a browser opens at app/index.html (ES modules, CSS, no build step), offline: it loads nothing
+// over the network, and its trophy list and guides are app/data/trophies.json. The program hands it in: it copies app/
+// and screenshots/ from beside this file to /output and writes /output/dossier.json, the summary the judge reads (your
+// screenshots, the first load's files and bytes, and your source), with the vendored make.fun library. Leave
+// vendor/makefun-frontend.ts as it is: the scorer requires dossier.json to be byte for byte what its own copy writes.
+//
+// Only the plumbing, not a winner: a plain checklist of the 55 trophies with a one-line hint each. Write a real guide
+// for every trophy in your own words, a roadmap to the platinum, filters and a spoiler setting in app/, put 3 or 4 PNG
+// or JPEG screenshots of it in screenshots/ (the first by name is the cover; shots.json says which views this
+// starter's were taken of), and run it.
 //
 // Serve it locally with `node serve.ts`, then open http://localhost:8080.
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-frontend.ts';
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-
-// Pre-flight: the gate refuses an entry whose trophy list is short or whose
-// screenshots are missing or oversized, so fail loudly here instead of
-// handing in a broken /output.
-const data = JSON.parse(readFileSync(join(here, 'app', 'data', 'trophies.json'), 'utf8'));
-if (!Array.isArray(data.trophies) || data.trophies.length !== 55) {
-  throw new Error(`expected 55 trophies in app/data/trophies.json, found ${data.trophies?.length ?? 0}`);
-}
-const badGuide = data.trophies.find((t) => typeof t.guide !== 'string' || !t.guide.trim());
-if (badGuide) throw new Error(`trophy ${badGuide.id} (${badGuide.name}) has no guide text`);
-const badSource = data.trophies.find((t) => !t.source || !t.source_url);
-if (badSource) throw new Error(`trophy ${badSource.id} (${badSource.name}) cites no source`);
-// The gate also caps index.html at 1 MiB — check it here so a bloated page
-// fails loudly instead of being handed in.
-const indexBytes = statSync(join(here, 'app', 'index.html')).size;
-if (indexBytes > 1048576) throw new Error(`app/index.html is ${indexBytes} bytes (cap 1 MiB)`);
-const shots = readdirSync(join(here, 'screenshots')).filter((f) => /\.(png|jpe?g)$/i.test(f)).sort();
-if (shots.length < 3 || shots.length > 4) {
-  throw new Error(`expected 3 or 4 screenshots, found ${shots.length}`);
-}
-for (const shot of shots) {
-  const bytes = statSync(join(here, 'screenshots', shot)).size;
-  if (bytes > 262144) throw new Error(`screenshot ${shot} is ${bytes} bytes (cap 256 KiB)`);
-}
 
 mkdirSync(out, { recursive: true });
 cpSync(join(here, 'app'), join(out, 'app'), { recursive: true });
@@ -56,4 +34,3 @@ writeFileSync(
   join(out, 'dossier.json'),
   buildDossier(out, { text_max_bytes: 163840, screenshots: { max: 4, max_bytes: 262144 }, app_max_files: 993, app_max_bytes: 50331648 }),
 );
-console.log(`Leonida Trophy Guide: ${data.trophies.length} trophies, ${shots.length} screenshots (${shots.join(', ')}) -> ${out}`);

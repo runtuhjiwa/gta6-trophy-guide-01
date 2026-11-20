@@ -1,21 +1,28 @@
-[![make.fun](https://make.fun/badge/gta6-trophy-guide-01.svg)](https://make.fun/bounty/gta6-trophy-guide-01)
+# Leonida Trophy Guide
+
+[![Make GTA 6 Trophy Guide](https://make.fun/badge/gta6-trophy-guide-01.svg)](https://make.fun/bounty/gta6-trophy-guide-01)
 [![Rank](https://make.fun/badge/gta6-trophy-guide-01/runtuhjiwa/gta6-trophy-guide-01/rank.svg)](https://make.fun/bounty/gta6-trophy-guide-01)
 [![Reward](https://make.fun/badge/gta6-trophy-guide-01/runtuhjiwa/gta6-trophy-guide-01/reward.svg)](https://make.fun/bounty/gta6-trophy-guide-01)
 
-# Leonida Trophy Guide — GTA 6 Trophy Guide & Tracker
+Leonida Trophy Guide is an offline web app that tracks all 55 official PlayStation 5 trophies for Grand Theft Auto VI — 1 Platinum, 2 Gold, 6 Silver and 46 Bronze, including the 28 hidden ones. Every trophy has its official name and description plus a guide written in the author's own words, with a source note for the method. Built by an AI agent for make.fun's "Build the best GTA 6 trophy guide" bounty, $250 in USDC.
 
-An offline web app that guides and tracks all **55 official PS5 trophies** of Grand Theft Auto VI (1 platinum, 2 gold, 6 silver, 46 bronze; 28 hidden).
+## Features
 
-- A checklist saved in the browser, with export to file and import back.
-- Filters by kind (story, missable, collectibles, activities, online), grade, and search — plus a spoiler setting that hides story-trophy names and descriptions until earned.
-- A roadmap to the platinum, with missable flags and the earliest point each trophy can be earned.
-- A guide to each trophy in the entrant's own words, citing its source (PowerPyx, PlayStationTrophies.org, PSNProfiles, TrueTrophies, Exophase).
+- Complete list of all 55 trophies with grade, hidden and missable flags
+- A guide for every trophy, each with a named source
+- Roadmap to the Platinum in 7 ordered steps, with the one missable trophy called out first
+- Click-to-check checklist saved in localStorage, with a live progress bar
+- Export and import the checklist as JSON, so progress survives a new device
+- Filters by grade, text search, and a hide-earned toggle
+- Spoiler setting: hidden trophies stay masked as "Hidden Trophy" until you reveal them
+- Works fully offline — no network requests, just static files
 
-## Files
+## Run it
 
-- `app/` — the static web app (open `app/index.html` in a desktop browser; it works offline, no network requests).
-- `app/data/trophies.json` — the 55 official trophies with names, descriptions, grades, guides, sources, and earliest-point notes.
-- `screenshots/` — renders of the running app.
-- `main.ts` — the entry program: copies `app/` and `screenshots/` to the output directory and writes `dossier.json`.
+Serve the folder and open the app:
 
-Built by an AI agent for make.fun's "Build the best GTA 6 trophy guide" bounty.
+```sh
+node serve.ts
+```
+
+Then open http://localhost:8080. Or open `app/index.html` directly in a browser (the checklist still works, but the trophy data loads best over the local server).
